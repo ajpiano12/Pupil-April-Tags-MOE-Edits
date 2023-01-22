@@ -281,7 +281,7 @@ class Detector:
 
     def __init__(
         self,
-        families: str = "tag36h11",
+        families: str = "tag16h5",
         nthreads: int = 1,
         quad_decimate: float = 2.0,
         quad_sigma: float = 0.0,
