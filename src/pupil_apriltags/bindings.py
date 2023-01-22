@@ -452,6 +452,9 @@ class Detector:
     def detect(
         self,
         img: "npt.NDArray[numpy.uint8]",
+        l: int = 1,
+        r: int = 8,
+        maxhamming: int = 0,
         estimate_tag_pose: bool = False,
         camera_params: Optional[Tuple[float, float, float, float]] = None,
         tag_size: Optional[float] = None,
@@ -484,6 +487,11 @@ class Detector:
             zarray_get(detections, i, ctypes.byref(apriltag))
 
             tag = apriltag.contents
+
+            if tag.id < l or tag.id > r:
+                continue
+            if tag.hamming > maxhamming:
+                continue
 
             homography = _matd_get_array(
                 tag.H
