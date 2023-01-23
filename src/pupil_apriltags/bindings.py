@@ -449,6 +449,39 @@ class Detector:
             self.libc.apriltag_detector_destroy.restype = None
             self.libc.apriltag_detector_destroy(self.tag_detector_ptr)
 
+    #function to find pose from corners
+    def find_pose(
+        corners,
+        camera_params: Tuple[float, float, float, float],
+        tag_size: float
+    ) -> Detection:
+        detection = Detection()
+        camera_fx, camera_fy, camera_cx, camera_cy = (c for c in camera_params)
+
+        apriltag = ctypes.POINTER(_ApriltagDetection)()
+
+        info = _ApriltagDetectionInfo(
+            det=apriltag,
+            tagsize=tag_size,
+            fx=camera_fx,
+            fy=camera_fy,
+            cx=camera_cx,
+            cy=camera_cy,
+        )
+        pose = _ApriltagPose()
+
+        self.libc.estimate_tag_pose.restype = ctypes.c_double
+        err = self.libc.estimate_tag_pose(
+            ctypes.byref(info), ctypes.byref(pose)
+        )
+
+        detection.pose_R = _matd_get_array(pose.R).copy()
+        detection.pose_t = _matd_get_array(pose.t).copy()
+        detection.pose_err = err
+
+        # Return this detection
+        return detection
+
     def detect(
         self,
         img: "npt.NDArray[numpy.uint8]",
