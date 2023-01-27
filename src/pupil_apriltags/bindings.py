@@ -448,7 +448,7 @@ class Detector:
             # destroy the detector
             self.libc.apriltag_detector_destroy.restype = None
             self.libc.apriltag_detector_destroy(self.tag_detector_ptr)
-
+    """
     #function to find pose from corners
     def find_pose(
         corners,
@@ -481,7 +481,7 @@ class Detector:
 
         # Return this detection
         return detection
-
+    """
     def detect(
         self,
         img: "npt.NDArray[numpy.uint8]",
