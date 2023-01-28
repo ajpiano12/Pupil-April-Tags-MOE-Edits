@@ -488,6 +488,7 @@ class Detector:
         l: int = 1,
         r: int = 8,
         maxhamming: int = 0,
+        maxmargin: float = 50.0,
         estimate_tag_pose: bool = False,
         camera_params: Optional[Tuple[float, float, float, float]] = None,
         tag_size: Optional[float] = None,
@@ -524,6 +525,8 @@ class Detector:
             if tag.id < l or tag.id > r:
                 continue
             if tag.hamming > maxhamming:
+                continue
+            if tag.decision_margin < maxmargin:
                 continue
 
             homography = _matd_get_array(
