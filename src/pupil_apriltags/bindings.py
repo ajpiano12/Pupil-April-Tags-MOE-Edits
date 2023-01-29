@@ -50,7 +50,7 @@ class _Matd(ctypes.Structure):
     _fields_ = [
         ("nrows", ctypes.c_int),
         ("ncols", ctypes.c_int),
-        ("data", ctypes.c_double * 1),
+        ("data", ctypes.POINTER(ctypes.c_double)), #was ctypes.c_double*1
     ]
 
 
@@ -448,9 +448,11 @@ class Detector:
             # destroy the detector
             self.libc.apriltag_detector_destroy.restype = None
             self.libc.apriltag_detector_destroy(self.tag_detector_ptr)
-    """
+    
     #function to find pose from corners
     def find_pose(
+        self,
+        homography,
         corners,
         camera_params: Tuple[float, float, float, float],
         tag_size: float
@@ -458,10 +460,22 @@ class Detector:
         detection = Detection()
         camera_fx, camera_fy, camera_cx, camera_cy = (c for c in camera_params)
 
-        apriltag = ctypes.POINTER(_ApriltagDetection)()
+        homography = [j for i in homography for j in i]
+
+        homoarray = ctypes.c_double*9
+        for i in range(9):
+            homoarray[i] = homography[i]
+        
+        homo = _Matd(nrows=3, ncols=3, data=ctypes.cast(homoarray, ctypes.POINTER(ctypes.c_double)))
+
+
+        apriltag = _ApriltagDetection(
+                    H = ctypes.pointer(homo),
+                    p = ((ctypes.c_double*2)*2)([(ctypes.c_double*2)(i) for i in corners])
+                    )
 
         info = _ApriltagDetectionInfo(
-            det=apriltag,
+            det=ctypes.POINTER(apriltag),
             tagsize=tag_size,
             fx=camera_fx,
             fy=camera_fy,
@@ -481,7 +495,7 @@ class Detector:
 
         # Return this detection
         return detection
-    """
+    
     def detect(
         self,
         img: "npt.NDArray[numpy.uint8]",
@@ -532,7 +546,7 @@ class Detector:
             homography = _matd_get_array(
                 tag.H
             ).copy()  # numpy.zeros((3,3)) # Don't ask questions, move on with your life
-            center = numpy.ctypeslib.as_array(tag.c, shape=(2,)).copy()
+            center = numpy.ctypeslib.as_array(tag.c, shape=(2,)).copy() #POSSIBLY CHANGE THIS LATER TO 1D
             corners = numpy.ctypeslib.as_array(tag.p, shape=(4, 2)).copy()
 
             detection = Detection()
