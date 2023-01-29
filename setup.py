@@ -23,6 +23,6 @@ setup(
     package_dir={"": "src"},
     include_package_data=False,
     cmake_args=cmake_args,
-    cmake_source_dir="src/pupil_apriltags",
-    cmake_install_dir="src/pupil_apriltags",
+    cmake_source_dir="src/moe_apriltags",
+    cmake_install_dir="src/moe_apriltags",
 )
