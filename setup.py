@@ -4,7 +4,7 @@ from setuptools import find_packages
 from skbuild import setup
 
 package_dir = "src"
-package = "pupil_apriltags"
+package = "moe_apriltags"
 
 cmake_args = []
 if platform.system() == "Windows":
