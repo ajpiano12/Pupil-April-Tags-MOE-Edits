@@ -18,6 +18,8 @@ if platform.system() == "Windows":
     cmake_args.append("-GVisual Studio 17 2022")
     cmake_args.append("-DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=True")
 
+cmake_args.append('-DBUILD_PYTHON_WRAPPER=OFF')
+
 setup(
     packages=find_packages(where="src"),
     package_dir={"": "src"},
